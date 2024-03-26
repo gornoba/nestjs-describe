@@ -56,6 +56,8 @@ class Application {
       origin: this.corsOrigin,
       credentials: true, // cookie를 사용하기 위해 설정
     });
+
+    this.server.setGlobalPrefix('api');
   }
 
   session() {
