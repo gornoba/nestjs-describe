@@ -1,10 +1,20 @@
-import { Controller, Get, Post, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { CreateCatDto, UpdateCatDto } from './dto/cats.dto';
 
 @Controller('cats')
 export class CatsController {
   @Post()
-  create() {
-    return 'This action adds a new cat';
+  create(@Body() createCatDto: CreateCatDto) {
+    return `This action adds a new cat ${createCatDto.name}`;
   }
 
   @Get()
@@ -13,17 +23,20 @@ export class CatsController {
   }
 
   @Get(':id')
-  findOne() {
-    return `This action returns a cat`;
+  findOne(@Param('id', new ParseIntPipe()) id: number) {
+    return `This action returns a cat ${id}`;
   }
 
   @Put(':id')
-  update() {
-    return `This action updates a cat`;
+  update(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() updateCatDto: UpdateCatDto,
+  ) {
+    return `This action updates a cat ${id}`;
   }
 
   @Delete(':id')
-  remove() {
-    return `This action removes a cat`;
+  remove(@Param('id', new ParseIntPipe()) id: number) {
+    return `This action removes a cat ${id}`;
   }
 }
