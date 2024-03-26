@@ -5,6 +5,8 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import dotenv from 'dotenv';
 import helmet, { contentSecurityPolicy } from 'helmet';
 import session from 'express-session';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import expressBasicAuth from 'express-basic-auth';
 
 dotenv.config();
 
@@ -21,6 +23,10 @@ class Application {
     'script-src': [],
   };
   private sessionSecret: string;
+  private swaggerAuthInfo: {
+    user: string;
+    password: string;
+  };
 
   constructor(private server: NestExpressApplication) {
     this.server = server;
@@ -38,9 +44,12 @@ class Application {
       this.directives['script-src'].push(src.trim()),
     );
     this.sessionSecret = process.env.SESSION_SECRET || 'secret';
+    this.swaggerAuthInfo = process.env.SWAGGER_AUTH
+      ? JSON.parse(process.env.SWAGGER_AUTH)
+      : { user: 'admin', password: '123' };
   }
 
-  policy() {
+  private policy() {
     this.server.use(
       helmet({
         contentSecurityPolicy: {
@@ -60,7 +69,7 @@ class Application {
     this.server.setGlobalPrefix('api');
   }
 
-  session() {
+  private session() {
     this.server.use(
       session({
         secret: Buffer.from(this.sessionSecret).toString('base64'), // 세션을 안전하게 유지하기 위한 비밀
@@ -76,7 +85,7 @@ class Application {
     );
   }
 
-  nestLib() {
+  private nestLib() {
     this.server.useGlobalPipes(
       new ValidationPipe({
         transform: true, // 요청 데이터를 해당 타입으로 변환
@@ -90,10 +99,36 @@ class Application {
     );
   }
 
+  private swaggerAuth() {
+    this.server.use(
+      ['/docs', '/docs-json'],
+      expressBasicAuth({
+        challenge: true,
+        users: {
+          [this.swaggerAuthInfo.user]: this.swaggerAuthInfo.password,
+        },
+      }),
+    );
+  }
+
+  private swagger() {
+    const config = new DocumentBuilder()
+      .setTitle('NestJS API')
+      .setDescription('NestJS API description')
+      .setVersion('1.0')
+      .addTag('nestjs')
+      .build();
+
+    const document = SwaggerModule.createDocument(this.server, config);
+    SwaggerModule.setup('docs', this.server, document);
+  }
+
   async bootstrap() {
     this.policy();
     this.session();
     this.nestLib();
+    this.swaggerAuth();
+    this.swagger();
     await this.server.listen(this.port);
     this.url = await this.server.getUrl();
   }
