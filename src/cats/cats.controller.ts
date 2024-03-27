@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CatsDto,
@@ -15,11 +16,13 @@ import {
   UpdateCatDto,
 } from './dto/cats.dto';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { HeaderGuard } from 'src/lib/auth/header.guard';
 
 @ApiTags('cats')
 @Controller('cats')
@@ -31,6 +34,7 @@ export class CatsController {
     breed: 'Scottish Fold',
   };
 
+  @ApiBearerAuth()
   @ApiCreatedResponse({
     description: '생성된 고양이를 반환합니다.',
     type: CatsDto,
@@ -40,6 +44,7 @@ export class CatsController {
     description:
       '이 API는 새로운 고양이를 생성합니다.<br/>고양이의 이름, 나이, 품종을 입력하세요.',
   })
+  @UseGuards(HeaderGuard)
   @Post()
   create(@Body() createCatDto: CreateCatDto): CatsDto {
     return this.cats;

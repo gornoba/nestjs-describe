@@ -117,6 +117,7 @@ class Application {
       .setDescription('NestJS API description')
       .setVersion('1.0')
       .addTag('nestjs')
+      .addBearerAuth()
       .build();
 
     const document = SwaggerModule.createDocument(this.server, config);
