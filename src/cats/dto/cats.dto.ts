@@ -1,5 +1,12 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateCatDto {
   @ApiProperty({
@@ -34,3 +41,24 @@ export class CreateCatDto {
 }
 
 export class UpdateCatDto extends PartialType(CreateCatDto) {}
+
+export class ArrayCreateCatDto {
+  @ApiProperty({
+    description: 'The datas of a cat',
+    required: true,
+    type: [CreateCatDto],
+  })
+  @ValidateNested({ each: true })
+  @Type(() => CreateCatDto)
+  @IsArray()
+  data: CreateCatDto[];
+}
+
+export class CatsDto extends CreateCatDto {
+  @ApiProperty({
+    description: 'The id of a cat',
+    example: 1,
+    type: Number,
+  })
+  id: number;
+}
