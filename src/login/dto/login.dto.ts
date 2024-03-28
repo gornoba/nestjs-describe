@@ -11,7 +11,7 @@ export class UsersDto {
   @Exclude()
   @IsNotEmpty()
   @IsNumberString()
-  password: string;
+  password?: string;
 
   constructor(partial: Partial<UsersDto>) {
     Object.assign(this, partial);

@@ -23,6 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { HeaderGuard } from 'src/lib/auth/header.guard';
+import { JwtAuthGuard } from 'src/lib/auth/jwt/jwt.guard';
 
 @ApiTags('cats')
 @Controller('cats')
@@ -62,6 +63,7 @@ export class CatsController {
       '고양이 정보를 `data: CreateCatDto[]` 형식으로 `body`를 보내세요.',
   })
   @Post('many')
+  @UseGuards(JwtAuthGuard)
   createMany(@Body() createCatDto: ArrayCreateCatDto): CatsDto[] {
     return [this.cats];
   }

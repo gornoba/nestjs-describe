@@ -11,6 +11,7 @@ import helmet, { contentSecurityPolicy } from 'helmet';
 import session from 'express-session';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import expressBasicAuth from 'express-basic-auth';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -105,6 +106,8 @@ class Application {
     this.server.useGlobalInterceptors(
       new ClassSerializerInterceptor(this.server.get(Reflector)),
     );
+
+    this.server.use(cookieParser());
   }
 
   private swaggerAuth() {

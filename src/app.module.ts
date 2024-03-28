@@ -4,9 +4,17 @@ import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
 import { LibModule } from './lib/lib.module';
 import { LoginModule } from './login/login.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [CatsModule, LibModule, LoginModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    CatsModule,
+    LibModule,
+    LoginModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
