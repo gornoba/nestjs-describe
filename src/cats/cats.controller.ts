@@ -34,6 +34,8 @@ export class CatsController {
     breed: 'Scottish Fold',
   };
 
+  constructor() {}
+
   @ApiBearerAuth()
   @ApiCreatedResponse({
     description: '생성된 고양이를 반환합니다.',

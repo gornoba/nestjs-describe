@@ -1,7 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import dotenv from 'dotenv';
 import helmet, { contentSecurityPolicy } from 'helmet';
 import session from 'express-session';
@@ -96,6 +100,10 @@ class Application {
         whitelist: false, // 허용되지 않은 속성이 있는 경우 제거
         forbidNonWhitelisted: false, // 허용되지 않은 속성이 있는 경우 예외 발생
       }),
+    );
+
+    this.server.useGlobalInterceptors(
+      new ClassSerializerInterceptor(this.server.get(Reflector)),
     );
   }
 
