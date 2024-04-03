@@ -1,5 +1,5 @@
 import { Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/lib/auth/local/local.guard';
 import { Request, Response } from 'express';
 import { LoginService } from 'src/login/login.service';
@@ -14,9 +14,10 @@ export class LoginController {
     private readonly loginService: LoginService,
   ) {}
 
+  @ApiBody({ type: UsersDto })
   @UseGuards(LocalAuthGuard)
-  @Post()
-  async login(
+  @Post('jwt')
+  async loginCookie(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<string> {
@@ -24,5 +25,12 @@ export class LoginController {
     const jwt = await this.jwtSignService.signJwt({ ...user });
     this.loginService.setCookie(res, jwt);
     return '로그인 성공';
+  }
+
+  @ApiBody({ type: UsersDto })
+  @UseGuards(LocalAuthGuard)
+  @Post('session')
+  async loginSession(@Req() req: Request): Promise<string> {
+    return this.loginService.setSession(req, req.user as UsersDto);
   }
 }

@@ -53,4 +53,10 @@ export class LoginService {
     });
     return res;
   }
+
+  setSession(req: any, user: UsersDto) {
+    req.session.isAuthenticated = true;
+    req.session.user = user;
+    return '로그인 성공';
+  }
 }

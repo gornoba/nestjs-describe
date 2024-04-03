@@ -12,6 +12,8 @@ import session from 'express-session';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import expressBasicAuth from 'express-basic-auth';
 import cookieParser from 'cookie-parser';
+import RedisStore from 'connect-redis'; // session store를 redis로 하려면 주석해제
+import { Redis } from 'ioredis'; // session store를 redis로 하려면 주석해제
 
 dotenv.config();
 
@@ -31,6 +33,10 @@ class Application {
   private swaggerAuthInfo: {
     user: string;
     password: string;
+  };
+  private redis: {
+    host: string;
+    port: number;
   };
 
   constructor(private server: NestExpressApplication) {
@@ -52,6 +58,7 @@ class Application {
     this.swaggerAuthInfo = process.env.SWAGGER_AUTH
       ? JSON.parse(process.env.SWAGGER_AUTH)
       : { user: 'admin', password: '123' };
+    this.redis = JSON.parse(process.env.REDIS);
   }
 
   private policy() {
@@ -77,6 +84,14 @@ class Application {
   private session() {
     this.server.use(
       session({
+        // session store를 redis로 하려면 주석해제
+        store: new RedisStore({
+          client: new Redis({
+            host: this.redis.host,
+            port: this.redis.port,
+          }),
+          ttl: 60 * 60,
+        }),
         secret: Buffer.from(this.sessionSecret).toString('base64'), // 세션을 안전하게 유지하기 위한 비밀
         resave: false, // 세션에 변경사항이 없으면 다시 저장하지 않음
         saveUninitialized: false, // 초기화되지 않은 세션을 스토어에 저장하지 않음
@@ -84,7 +99,6 @@ class Application {
           secure: process.env.ENV === 'production', // https 프로토콜을 사용하는 경우 true
           httpOnly: true, // 클라이언트에서 쿠키를 확인하지 못하도록 함
           maxAge: 1000 * 60 * 60, // 쿠키 유효 시간
-          sameSite: 'none', // 쿠키 전송 위치 설정
         },
       }),
     );

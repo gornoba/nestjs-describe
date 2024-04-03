@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
+  Session,
 } from '@nestjs/common';
 import {
   CatsDto,
@@ -24,6 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { HeaderGuard } from 'src/lib/auth/header.guard';
 import { JwtAuthGuard } from 'src/lib/auth/jwt/jwt.guard';
+import { SessionGuard } from 'src/lib/auth/session/session.guard';
 
 @ApiTags('cats')
 @Controller('cats')
@@ -62,8 +64,8 @@ export class CatsController {
     description:
       '고양이 정보를 `data: CreateCatDto[]` 형식으로 `body`를 보내세요.',
   })
-  @Post('many')
   @UseGuards(JwtAuthGuard)
+  @Post('many')
   createMany(@Body() createCatDto: ArrayCreateCatDto): CatsDto[] {
     return [this.cats];
   }
@@ -75,8 +77,10 @@ export class CatsController {
   @ApiOperation({
     summary: '모든 고양이를 반환합니다.',
   })
+  @UseGuards(SessionGuard)
   @Get()
-  findAll(): CatsDto[] {
+  findAll(@Session() session: Record<string, any>): CatsDto[] {
+    console.log(session);
     return [this.cats];
   }
 

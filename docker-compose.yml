@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: development
+    command: npm run start:dev
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+    volumes:
+      - .:/usr/src
+      - /usr/src/node_modules
+    ports:
+      - '3000:3000'
+
+  redis:
+    image: redis:alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - ./redis-data:/data
+    ports:
+      - '6379:6379'
