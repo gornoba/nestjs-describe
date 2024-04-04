@@ -20,6 +20,8 @@ export class UsersDto {
   @IsNumberString()
   password?: string;
 
+  roles?: string[];
+
   constructor(partial: Partial<UsersDto>) {
     Object.assign(this, partial);
   }

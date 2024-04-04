@@ -21,11 +21,15 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { HeaderGuard } from 'src/lib/auth/header.guard';
 import { JwtAuthGuard } from 'src/lib/auth/jwt/jwt.guard';
 import { SessionGuard } from 'src/lib/auth/session/session.guard';
+import { Roles } from 'src/lib/auth/rbac/rbac.decorator';
+import { Role } from 'src/lib/auth/rbac/rbac.role';
+import { RolesGuard } from 'src/lib/auth/rbac/rbac.guard';
 
 @ApiTags('cats')
 @Controller('cats')
@@ -91,6 +95,14 @@ export class CatsController {
   @ApiOperation({
     summary: '해당 아이디의 고양이를 반환합니다.',
   })
+  @ApiParam({
+    name: 'id',
+    example: 1,
+    required: true,
+    type: Number,
+  })
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Get(':id')
   findOne(@Param('id', new ParseIntPipe()) id: number): CatsDto {
     return this.cats;

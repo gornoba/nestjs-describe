@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { UsersDto } from './dto/login.dto';
 import { Response } from 'express';
+import { Role } from 'src/lib/auth/rbac/rbac.role';
 @Injectable()
 export class LoginService {
   private readonly users: UsersDto[] = [
@@ -12,6 +13,7 @@ export class LoginService {
       id: 1,
       username: 'atreides',
       password: '12',
+      roles: [Role.Admin],
     },
     {
       id: 2,

@@ -90,7 +90,6 @@ class Application {
             host: this.redis.host,
             port: this.redis.port,
           }),
-          ttl: 60 * 60,
         }),
         secret: Buffer.from(this.sessionSecret).toString('base64'), // 세션을 안전하게 유지하기 위한 비밀
         resave: false, // 세션에 변경사항이 없으면 다시 저장하지 않음
