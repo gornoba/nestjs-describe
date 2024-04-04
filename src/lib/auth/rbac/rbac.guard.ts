@@ -22,10 +22,10 @@ export class RolesGuard implements CanActivate {
     const session = requset.session;
     const user = session.user;
 
-    if (user.roles?.includes(Role.Admin)) {
+    if (user?.roles?.includes(Role.Admin)) {
       return true;
     }
 
-    return requiredRoles.some((role) => user.roles?.includes(role));
+    return requiredRoles.some((role) => user?.roles?.includes(role));
   }
 }

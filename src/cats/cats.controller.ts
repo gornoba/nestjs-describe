@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Session,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   CatsDto,
@@ -30,6 +31,9 @@ import { SessionGuard } from 'src/lib/auth/session/session.guard';
 import { Roles } from 'src/lib/auth/rbac/rbac.decorator';
 import { Role } from 'src/lib/auth/rbac/rbac.role';
 import { RolesGuard } from 'src/lib/auth/rbac/rbac.guard';
+import { User } from 'src/lib/decorators/user.decorator';
+import { UsersDto } from 'src/login/dto/login.dto';
+import { Auth } from 'src/lib/decorators/auth.decorator';
 
 @ApiTags('cats')
 @Controller('cats')
@@ -101,11 +105,10 @@ export class CatsController {
     required: true,
     type: Number,
   })
-  @Roles(Role.Admin)
-  @UseGuards(RolesGuard)
+  @Auth(Role.Admin)
   @Get(':id')
-  findOne(@Param('id', new ParseIntPipe()) id: number): CatsDto {
-    return this.cats;
+  findOne(@Param('id', new ParseIntPipe()) id: number, @User() user: UsersDto) {
+    return user;
   }
 
   @ApiOkResponse({
