@@ -8,8 +8,6 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
-  Session,
-  ValidationPipe,
 } from '@nestjs/common';
 import {
   CatsDto,
@@ -25,27 +23,17 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { HeaderGuard } from 'src/lib/auth/header.guard';
-import { JwtAuthGuard } from 'src/lib/auth/jwt/jwt.guard';
 import { SessionGuard } from 'src/lib/auth/session/session.guard';
-import { Roles } from 'src/lib/auth/rbac/rbac.decorator';
 import { Role } from 'src/lib/auth/rbac/rbac.role';
-import { RolesGuard } from 'src/lib/auth/rbac/rbac.guard';
-import { User } from 'src/lib/decorators/user.decorator';
-import { UsersDto } from 'src/login/dto/login.dto';
 import { Auth } from 'src/lib/decorators/auth.decorator';
+import { CatsService } from './cats.service';
 
 @ApiTags('cats')
+@UseGuards(SessionGuard)
+@Auth(Role.Admin)
 @Controller('cats')
 export class CatsController {
-  private cats: CatsDto = {
-    id: 1,
-    name: 'Kitty',
-    age: 3,
-    breed: 'Scottish Fold',
-  };
-
-  constructor() {}
+  constructor(private readonly catsService: CatsService) {}
 
   @ApiBearerAuth()
   @ApiCreatedResponse({
@@ -57,10 +45,9 @@ export class CatsController {
     description:
       '이 API는 새로운 고양이를 생성합니다.<br/>고양이의 이름, 나이, 품종을 입력하세요.',
   })
-  @UseGuards(HeaderGuard)
   @Post()
   create(@Body() createCatDto: CreateCatDto): CatsDto {
-    return this.cats;
+    return this.catsService.create(createCatDto);
   }
 
   @ApiCreatedResponse({
@@ -72,10 +59,9 @@ export class CatsController {
     description:
       '고양이 정보를 `data: CreateCatDto[]` 형식으로 `body`를 보내세요.',
   })
-  @UseGuards(JwtAuthGuard)
   @Post('many')
   createMany(@Body() createCatDto: ArrayCreateCatDto): CatsDto[] {
-    return [this.cats];
+    return this.catsService.createMany(createCatDto.data);
   }
 
   @ApiOkResponse({
@@ -85,11 +71,9 @@ export class CatsController {
   @ApiOperation({
     summary: '모든 고양이를 반환합니다.',
   })
-  @UseGuards(SessionGuard)
   @Get()
-  findAll(@Session() session: Record<string, any>): CatsDto[] {
-    console.log(session);
-    return [this.cats];
+  findAll(): CatsDto[] {
+    return this.catsService.findAll();
   }
 
   @ApiOkResponse({
@@ -105,10 +89,9 @@ export class CatsController {
     required: true,
     type: Number,
   })
-  @Auth(Role.Admin)
   @Get(':id')
-  findOne(@Param('id', new ParseIntPipe()) id: number, @User() user: UsersDto) {
-    return user;
+  findOne(@Param('id', new ParseIntPipe()) id: number): CatsDto {
+    return this.catsService.findOne(id);
   }
 
   @ApiOkResponse({
@@ -125,7 +108,7 @@ export class CatsController {
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateCatDto: UpdateCatDto,
   ): CatsDto {
-    return this.cats;
+    return this.catsService.update(id, updateCatDto);
   }
 
   @ApiOkResponse({
@@ -137,6 +120,6 @@ export class CatsController {
   })
   @Delete(':id')
   remove(@Param('id', new ParseIntPipe()) id: number): CatsDto {
-    return this.cats;
+    return this.catsService.remove(id);
   }
 }

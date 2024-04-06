@@ -61,4 +61,9 @@ export class CatsDto extends CreateCatDto {
     type: Number,
   })
   id: number;
+
+  constructor(cat: { id: number; name: string; age: number; breed: string }) {
+    super();
+    Object.assign(this, cat);
+  }
 }
