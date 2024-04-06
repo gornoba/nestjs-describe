@@ -9,4 +9,10 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('sleep')
+  async sleep(): Promise<string> {
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    return 'sleep';
+  }
 }

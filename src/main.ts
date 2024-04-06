@@ -14,6 +14,8 @@ import expressBasicAuth from 'express-basic-auth';
 import cookieParser from 'cookie-parser';
 import RedisStore from 'connect-redis'; // session store를 redis로 하려면 주석해제
 import { Redis } from 'ioredis'; // session store를 redis로 하려면 주석해제
+import { ResponseInterceptor } from './lib/interceptors/response.interceptor';
+import { TimeoutInterceptor } from './lib/interceptors/timeout.interceptor';
 
 dotenv.config();
 
@@ -118,6 +120,11 @@ class Application {
 
     this.server.useGlobalInterceptors(
       new ClassSerializerInterceptor(this.server.get(Reflector)),
+    );
+
+    this.server.useGlobalInterceptors(
+      new ResponseInterceptor(),
+      new TimeoutInterceptor(),
     );
 
     this.server.use(cookieParser());
