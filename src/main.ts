@@ -16,6 +16,8 @@ import RedisStore from 'connect-redis'; // session store를 redis로 하려면 �
 import { Redis } from 'ioredis'; // session store를 redis로 하려면 주석해제
 import { ResponseInterceptor } from './lib/interceptors/response.interceptor';
 import { TimeoutInterceptor } from './lib/interceptors/timeout.interceptor';
+import { HttpExceptionFilter } from './lib/exceptions/http-exception.filter';
+import { AllExceptionsFilter } from './lib/exceptions/all-exception.filter';
 
 dotenv.config();
 
@@ -125,6 +127,11 @@ class Application {
     this.server.useGlobalInterceptors(
       new ResponseInterceptor(),
       new TimeoutInterceptor(),
+    );
+
+    this.server.useGlobalFilters(
+      new AllExceptionsFilter(),
+      new HttpExceptionFilter(),
     );
 
     this.server.use(cookieParser());
