@@ -35,7 +35,6 @@ import { CatsService } from './cats.service';
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
-  @ApiBearerAuth()
   @ApiCreatedResponse({
     description: '생성된 고양이를 반환합니다.',
     type: CatsDto,
