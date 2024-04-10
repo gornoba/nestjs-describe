@@ -16,7 +16,6 @@ import {
   UpdateCatDto,
 } from './dto/cats.dto';
 import {
-  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,

@@ -9,6 +9,7 @@ services:
       - ./.env
     depends_on:
       - redis
+      - database
     volumes:
       - .:/usr/src
       - /usr/src/node_modules
@@ -22,3 +23,12 @@ services:
       - ./redis-data:/data
     ports:
       - '6379:6379'
+
+  database:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: abcde
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'

@@ -15,4 +15,5 @@ node_modules
 .prettierrc
 README.md
 
-redis-data
+redis-data/
+postgres-data/
