@@ -10,12 +10,17 @@ import { CatsController } from './cats/cats.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfig } from './lib/config/typeorm.conn';
 import { DbModule } from './db/db.module';
+import { ClsModule } from 'nestjs-cls';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(TypeOrmConfig),
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
     }),
     CatsModule,
     LibModule,

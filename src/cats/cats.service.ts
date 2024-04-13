@@ -1,9 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CatsDto, CreateCatDto, UpdateCatDto } from './dto/cats.dto';
+import { TransactionDeco } from 'src/lib/decorators/transaction.decorator';
+import { UserRepository } from 'src/db/repositories/user.repository';
 
 @Injectable()
 export class CatsService {
-  private readonly cats: CatsDto[] = [];
+  private readonly cats: CatsDto[] = [
+    {
+      id: 1,
+      name: 'Cat1',
+      age: 1,
+      breed: 'Breed1',
+    },
+  ];
+
+  constructor(private readonly userRepository: UserRepository) {}
 
   create(cat: CreateCatDto): CatsDto {
     const total = this.cats.length;
@@ -28,8 +39,9 @@ export class CatsService {
     return returnCats;
   }
 
-  findAll(): CatsDto[] {
-    return this.cats;
+  @TransactionDeco()
+  async findAll() {
+    return await this.userRepository.findAll();
   }
 
   findOne(id: number): CatsDto {

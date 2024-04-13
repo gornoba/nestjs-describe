@@ -6,6 +6,8 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtSignService } from './auth/jwt/jwt-sign.service';
 import { JwtStrategy } from './auth/jwt/jwt.strategy';
+import { AopModule } from '@toss/nestjs-aop';
+import { Transaction } from './decorators/transaction.decorator';
 
 @Module({
   imports: [
@@ -21,8 +23,9 @@ import { JwtStrategy } from './auth/jwt/jwt.strategy';
     }),
     LoginModule,
     PassportModule,
+    AopModule,
   ],
-  providers: [LocalStrategy, JwtSignService, JwtStrategy],
-  exports: [JwtSignService],
+  providers: [LocalStrategy, JwtSignService, JwtStrategy, Transaction],
+  exports: [JwtSignService, Transaction],
 })
 export class LibModule {}

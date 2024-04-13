@@ -70,7 +70,7 @@ export class CatsController {
     summary: '모든 고양이를 반환합니다.',
   })
   @Get()
-  findAll(): CatsDto[] {
+  findAll() {
     return this.catsService.findAll();
   }
 

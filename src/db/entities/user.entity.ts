@@ -6,7 +6,7 @@ import { AbstractEntity } from '../common/abstract.entity';
 })
 @Index(['email'], { unique: true })
 @Index(['name'])
-export class User extends AbstractEntity {
+export class UserEntity extends AbstractEntity {
   @Column({
     type: 'varchar',
   })
