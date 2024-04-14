@@ -1,44 +1,13 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, ValidateNested } from 'class-validator';
+import { CatsEntity } from 'src/db/entities/cat.entity';
 
-export class CreateCatDto {
-  @ApiProperty({
-    description: 'The name of a cat',
-    example: 'Kitty',
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @ApiProperty({
-    description: 'The age of a cat',
-    example: 3,
-    required: true,
-    type: Number,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  age: number;
-
-  @ApiProperty({
-    description: 'The breed of a cat',
-    example: 'Scottish Fold',
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @IsNotEmpty()
-  breed: string;
-}
+export class CreateCatDto extends PickType(CatsEntity, [
+  'name',
+  'age',
+  'breed',
+] as const) {}
 
 export class UpdateCatDto extends PartialType(CreateCatDto) {}
 

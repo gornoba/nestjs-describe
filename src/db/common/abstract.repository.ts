@@ -3,18 +3,24 @@ import { AbstractEntity } from './abstract.entity';
 import {
   DataSource,
   DeepPartial,
+  EntityManager,
   EntityTarget,
   FindManyOptions,
 } from 'typeorm';
+import { ClsService } from 'nestjs-cls';
 
 export abstract class AbstractRepository<T extends AbstractEntity> {
-  constructor(protected readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    protected readonly cls: ClsService,
+  ) {}
 
   async find(
     entity: EntityTarget<T>,
     options?: FindManyOptions,
   ): Promise<T[] | T> {
-    const repository = this.dataSource.getRepository<T>(entity);
+    const queryRunner: EntityManager = this.cls.get('transaction');
+    const repository = queryRunner.getRepository<T>(entity);
     const result = await repository.find(options);
 
     if (result.length === 1) {
@@ -25,16 +31,15 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
   }
 
   async upsert(entity: EntityTarget<T>, data: DeepPartial<T[]>): Promise<T[]> {
-    const repository = this.dataSource.getRepository<T>(entity);
+    const queryRunner: EntityManager = this.cls.get('transaction');
+    const repository = queryRunner.getRepository<T>(entity);
     const tmpArr = [];
 
     for (const item of data) {
       try {
         if (item?.id) {
           const findOne = await this.find(entity, {
-            where: {
-              id: item.id,
-            },
+            where: { id: item.id },
           });
 
           if (!findOne) {
@@ -54,7 +59,21 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
     return repository.save(tmpArr);
   }
 
-  createQueryBuilder() {
-    return this.dataSource.createQueryBuilder();
+  async delete(entity: EntityTarget<T>, id: number): Promise<T> {
+    const queryRunner: EntityManager = this.cls.get('transaction');
+    const repository = queryRunner.getRepository<T>(entity);
+    const findOne = (await this.find(entity, {
+      where: { id },
+    })) as T;
+
+    if (!findOne) {
+      throw new BadRequestException(`${id} Not found`);
+    }
+
+    return repository.remove(findOne);
+  }
+
+  createQueryBuilder(): EntityManager {
+    return this.cls.get('transaction');
   }
 }

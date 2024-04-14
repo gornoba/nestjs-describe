@@ -15,7 +15,7 @@ export class Transaction implements LazyDecorator<any, any> {
     private readonly cls: ClsService,
   ) {}
 
-  wrap({ method, metadata }: WrapParams<any, any>) {
+  wrap({ method }: WrapParams<any, any>) {
     return async (...args: any) => {
       const queryRunner = this.dataSource.createQueryRunner();
       this.cls.set('transaction', queryRunner.manager);
@@ -25,7 +25,6 @@ export class Transaction implements LazyDecorator<any, any> {
 
       try {
         const result = await method(...args);
-        console.log(metadata);
         await queryRunner.commitTransaction();
 
         return result;

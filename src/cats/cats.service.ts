@@ -1,65 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CatsDto, CreateCatDto, UpdateCatDto } from './dto/cats.dto';
 import { TransactionDeco } from 'src/lib/decorators/transaction.decorator';
-import { UserRepository } from 'src/db/repositories/user.repository';
+import { CatsRepository } from '../db/repositories/cat.repository';
+import { CatsEntity } from 'src/db/entities/cat.entity';
 
 @Injectable()
 export class CatsService {
-  private readonly cats: CatsDto[] = [
-    {
-      id: 1,
-      name: 'Cat1',
-      age: 1,
-      breed: 'Breed1',
-    },
-  ];
+  private readonly cats: CatsDto[] = [];
 
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly catsRepository: CatsRepository) {}
 
-  create(cat: CreateCatDto): CatsDto {
-    const total = this.cats.length;
-
-    const cats = new CatsDto({ id: total + 1, ...cat });
-    this.cats.push(cats);
-
-    return cats;
-  }
-
-  createMany(cats: CreateCatDto[]): CatsDto[] {
-    const returnCats: CatsDto[] = [];
-
-    for (const cat of cats) {
-      const total = this.cats.length;
-
-      const newCat = new CatsDto({ id: total + 1, ...cat });
-      returnCats.push(newCat);
-    }
-    this.cats.push(...returnCats);
-
-    return returnCats;
+  @TransactionDeco()
+  async create(cat: CreateCatDto): Promise<CatsEntity[]> {
+    return await this.catsRepository.upsert(CatsEntity, [cat]);
   }
 
   @TransactionDeco()
-  async findAll() {
-    return await this.userRepository.findAll();
+  async createMany(cats: CreateCatDto[]): Promise<CatsEntity[]> {
+    return await this.catsRepository.upsert(CatsEntity, cats);
   }
 
-  findOne(id: number): CatsDto {
-    return this.cats.find((cat) => cat.id === id);
+  @TransactionDeco()
+  async findAll(): Promise<CatsEntity[]> {
+    return (await this.catsRepository.find(CatsEntity)) as CatsEntity[];
   }
 
-  update(id: number, cat: UpdateCatDto): CatsDto {
-    const index = this.cats.findIndex((cat) => cat.id === id);
-    this.cats[index] = new CatsDto(Object.assign(this.cats[index], cat));
-
-    return this.cats[index];
+  @TransactionDeco()
+  async findOne(id: number): Promise<CatsEntity> {
+    return (await await this.catsRepository.find(CatsEntity, {
+      where: { id },
+    })) as CatsEntity;
   }
 
-  remove(id: number): CatsDto {
-    const index = this.cats.findIndex((cat) => cat.id === id);
-    const cat = this.cats[index];
-    this.cats.splice(index, 1);
+  @TransactionDeco()
+  async update(id: number, cat: UpdateCatDto): Promise<CatsEntity[]> {
+    return await this.catsRepository.upsert(CatsEntity, [{ id, ...cat }]);
+  }
 
-    return cat;
+  @TransactionDeco()
+  async remove(id: number): Promise<CatsEntity> {
+    return await this.catsRepository.delete(CatsEntity, id);
   }
 }
