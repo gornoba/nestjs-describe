@@ -1,12 +1,12 @@
-import {
-  Aspect,
-  LazyDecorator,
-  WrapParams,
-  createDecorator,
-} from '@toss/nestjs-aop';
 import { TRANSACTION_CONSTANT } from '../constants/transaction.constant';
 import { DataSource } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
+import { Aspect } from './aspect.decorator';
+import {
+  LazyDecorator,
+  WrapParams,
+} from '../interfaces/lazy-decorator.interface';
+import { createAopDecorator } from './create-aop.decorator';
 
 @Aspect(TRANSACTION_CONSTANT)
 export class Transaction implements LazyDecorator<any, any> {
@@ -38,4 +38,4 @@ export class Transaction implements LazyDecorator<any, any> {
 }
 
 export const TransactionDeco = (metadata?: { db?: string }) =>
-  createDecorator(TRANSACTION_CONSTANT, metadata);
+  createAopDecorator(TRANSACTION_CONSTANT, metadata);
