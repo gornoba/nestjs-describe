@@ -1,49 +1,36 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersDto } from './dto/login.dto';
 import { Response } from 'express';
-import { Role } from 'src/lib/auth/rbac/rbac.role';
+import { UserRepository } from '../db/repositories/user.repository';
+import { TransactionDeco } from 'src/lib/decorators/transaction.decorator';
+import { UserEntity } from 'src/db/entities/user.entity';
 @Injectable()
 export class LoginService {
-  private readonly users: UsersDto[] = [
-    {
-      id: 1,
-      username: 'atreides',
-      password: '12',
-      roles: [Role.Admin],
-    },
-    {
-      id: 2,
-      username: 'harkonnen',
-      password: '23',
-    },
-    {
-      id: 3,
-      username: 'Fremen',
-      password: '34',
-    },
-    {
-      id: 4,
-      username: 'Corrino',
-      password: '45',
-    },
-  ];
+  constructor(private readonly userRepository: UserRepository) {}
 
-  login(username: string, password: string): UsersDto {
-    const findUser = this.users.find((user) => user.username === username);
+  @TransactionDeco()
+  createAccount(body: UsersDto) {
+    return this.userRepository.upsert(UserEntity, [body]);
+  }
 
-    if (!findUser) {
-      throw new BadRequestException('사용자를 찾을 수 없습니다.');
-    }
+  @TransactionDeco()
+  getUser(id: number) {
+    return this.userRepository.find(UserEntity, {
+      where: { id },
+    });
+  }
 
-    if (findUser.password !== password) {
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
-    }
-
-    return new UsersDto(findUser);
+  @TransactionDeco()
+  login(
+    username: string,
+    password: string,
+  ): Promise<UserEntity[] | UserEntity> {
+    return this.userRepository.find(UserEntity, {
+      where: {
+        username,
+        password,
+      },
+    });
   }
 
   setCookie(res: Response, token: string) {

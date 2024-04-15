@@ -4,7 +4,7 @@ import { UserRepository } from './repositories/user.repository';
 import { CatsRepository } from './repositories/cat.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature()],
+  imports: [TypeOrmModule.forFeature([])],
   providers: [UserRepository, CatsRepository],
   exports: [UserRepository, CatsRepository],
 })

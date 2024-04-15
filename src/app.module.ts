@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfig } from './lib/config/typeorm.conn';
 import { DbModule } from './db/db.module';
 import { ClsModule } from 'nestjs-cls';
+import { UserEntity } from './db/entities/user.entity';
 
 @Module({
   imports: [
@@ -20,7 +21,19 @@ import { ClsModule } from 'nestjs-cls';
     }),
     ClsModule.forRoot({
       global: true,
-      middleware: { mount: true },
+      middleware: {
+        mount: true,
+        setup: (cls, req) => {
+          const session = req.session;
+          if (session?.user) {
+            const userEntity = new UserEntity({
+              id: session.user.id,
+            });
+
+            cls.set('userId', userEntity);
+          }
+        },
+      },
     }),
     CatsModule,
     LibModule,

@@ -1,24 +1,21 @@
 import { BadRequestException } from '@nestjs/common';
 import { AbstractEntity } from './abstract.entity';
 import {
-  DataSource,
   DeepPartial,
   EntityManager,
   EntityTarget,
   FindManyOptions,
 } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
+import { UserEntity } from '../entities/user.entity';
 
 export abstract class AbstractRepository<T extends AbstractEntity> {
-  constructor(
-    private readonly dataSource: DataSource,
-    protected readonly cls: ClsService,
-  ) {}
+  constructor(protected readonly cls: ClsService) {}
 
   async find(
     entity: EntityTarget<T>,
     options?: FindManyOptions,
-  ): Promise<T[] | T> {
+  ): Promise<T[] | T | UserEntity> {
     const queryRunner: EntityManager = this.cls.get('transaction');
     const repository = queryRunner.getRepository<T>(entity);
     const result = await repository.find(options);
@@ -35,6 +32,7 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
     data: DeepPartial<T[]>,
   ): Promise<T[] | T> {
     const queryRunner: EntityManager = this.cls.get('transaction');
+    const userInfo = this.cls.get('userId');
     const repository = queryRunner.getRepository<T>(entity);
     const tmpArr = [];
 
@@ -59,6 +57,11 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
       }
     }
 
+    if (userInfo) {
+      tmpArr.forEach((item) => {
+        item.user = userInfo;
+      });
+    }
     const result = await repository.save(tmpArr);
     return result.length === 1 ? (result[0] as T) : (result as T[]);
   }

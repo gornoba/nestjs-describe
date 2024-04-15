@@ -7,6 +7,7 @@ import {
   WrapParams,
 } from '../interfaces/lazy-decorator.interface';
 import { createAopDecorator } from './create-aop.decorator';
+import { BadRequestException } from '@nestjs/common';
 
 @Aspect(TRANSACTION_CONSTANT)
 export class Transaction implements LazyDecorator<any, any> {
@@ -30,6 +31,7 @@ export class Transaction implements LazyDecorator<any, any> {
         return result;
       } catch (error) {
         await queryRunner.rollbackTransaction();
+        throw new BadRequestException(error.message);
       } finally {
         await queryRunner.release();
       }

@@ -1,28 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
-import { IsNotEmpty, IsNumberString, IsString } from 'class-validator';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumberString } from 'class-validator';
+import { UserEntity } from 'src/db/entities/user.entity';
 
-export class UsersDto {
-  id: number;
-
-  @ApiProperty({
-    example: 'atreides',
-  })
-  @IsNotEmpty()
-  @IsString()
-  username: string;
-
+export class UsersDto extends PickType(UserEntity, [
+  'id',
+  'username',
+  'roles',
+] as const) {
   @ApiProperty({
     example: '12',
   })
-  @Exclude()
   @IsNotEmpty()
   @IsNumberString()
-  password?: string;
-
-  roles?: string[];
-
-  constructor(partial: Partial<UsersDto>) {
-    Object.assign(this, partial);
-  }
+  password: string;
 }

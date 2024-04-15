@@ -1,5 +1,15 @@
-import { Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/lib/auth/local/local.guard';
 import { Request, Response } from 'express';
 import { LoginService } from 'src/login/login.service';
@@ -13,6 +23,17 @@ export class LoginController {
     private readonly jwtSignService: JwtSignService,
     private readonly loginService: LoginService,
   ) {}
+
+  @Post('create')
+  async createAccount(@Body() body: UsersDto) {
+    return this.loginService.createAccount(body);
+  }
+
+  @ApiParam({ name: 'id', type: Number, example: 4 })
+  @Get('user/:id')
+  async getUser(@Param('id', new ParseIntPipe()) id: number) {
+    return this.loginService.getUser(id);
+  }
 
   @ApiBody({ type: UsersDto })
   @UseGuards(LocalAuthGuard)

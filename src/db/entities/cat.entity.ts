@@ -1,7 +1,8 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Relation } from 'typeorm';
 import { AbstractEntity } from '../common/abstract.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { UserEntity } from './user.entity';
 
 @Entity({
   name: 'cats',
@@ -45,4 +46,11 @@ export class CatsEntity extends AbstractEntity {
     type: 'varchar',
   })
   breed: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.cat)
+  @JoinColumn({
+    name: 'user_id',
+    referencedColumnName: 'id',
+  })
+  user: Relation<UserEntity[]>;
 }
