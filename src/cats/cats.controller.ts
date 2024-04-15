@@ -26,6 +26,7 @@ import { SessionGuard } from 'src/lib/auth/session/session.guard';
 import { Role } from 'src/lib/auth/rbac/rbac.role';
 import { Auth } from 'src/lib/decorators/auth.decorator';
 import { CatsService } from './cats.service';
+import { CatsEntity } from 'src/db/entities/cat.entity';
 
 @ApiTags('cats')
 @UseGuards(SessionGuard)
@@ -44,8 +45,10 @@ export class CatsController {
       '이 API는 새로운 고양이를 생성합니다.<br/>고양이의 이름, 나이, 품종을 입력하세요.',
   })
   @Post()
-  create(@Body() createCatDto: CreateCatDto): CatsDto {
-    return this.catsService.create(createCatDto);
+  async create(
+    @Body() createCatDto: CreateCatDto,
+  ): Promise<CatsEntity | CatsEntity[]> {
+    return await this.catsService.create(createCatDto);
   }
 
   @ApiCreatedResponse({
@@ -58,7 +61,9 @@ export class CatsController {
       '고양이 정보를 `data: CreateCatDto[]` 형식으로 `body`를 보내세요.',
   })
   @Post('many')
-  createMany(@Body() createCatDto: ArrayCreateCatDto): CatsDto[] {
+  createMany(
+    @Body() createCatDto: ArrayCreateCatDto,
+  ): Promise<CatsEntity | CatsEntity[]> {
     return this.catsService.createMany(createCatDto.data);
   }
 
@@ -88,7 +93,9 @@ export class CatsController {
     type: Number,
   })
   @Get(':id')
-  findOne(@Param('id', new ParseIntPipe()) id: number): CatsDto {
+  findOne(
+    @Param('id', new ParseIntPipe()) id: number,
+  ): Promise<CatsEntity | CatsEntity[]> {
     return this.catsService.findOne(id);
   }
 
@@ -105,7 +112,7 @@ export class CatsController {
   update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateCatDto: UpdateCatDto,
-  ): CatsDto {
+  ): Promise<CatsEntity | CatsEntity[]> {
     return this.catsService.update(id, updateCatDto);
   }
 
@@ -117,7 +124,7 @@ export class CatsController {
     summary: '해당 아이디의 고양이를 삭제합니다.',
   })
   @Delete(':id')
-  remove(@Param('id', new ParseIntPipe()) id: number): CatsDto {
+  remove(@Param('id', new ParseIntPipe()) id: number): Promise<CatsEntity> {
     return this.catsService.remove(id);
   }
 }

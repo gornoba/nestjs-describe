@@ -30,7 +30,10 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
     return result;
   }
 
-  async upsert(entity: EntityTarget<T>, data: DeepPartial<T[]>): Promise<T[]> {
+  async upsert(
+    entity: EntityTarget<T>,
+    data: DeepPartial<T[]>,
+  ): Promise<T[] | T> {
     const queryRunner: EntityManager = this.cls.get('transaction');
     const repository = queryRunner.getRepository<T>(entity);
     const tmpArr = [];
@@ -56,7 +59,8 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
       }
     }
 
-    return repository.save(tmpArr);
+    const result = await repository.save(tmpArr);
+    return result.length === 1 ? (result[0] as T) : (result as T[]);
   }
 
   async delete(entity: EntityTarget<T>, id: number): Promise<T> {

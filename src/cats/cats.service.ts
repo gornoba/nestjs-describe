@@ -11,12 +11,12 @@ export class CatsService {
   constructor(private readonly catsRepository: CatsRepository) {}
 
   @TransactionDeco()
-  async create(cat: CreateCatDto): Promise<CatsEntity[]> {
+  async create(cat: CreateCatDto): Promise<CatsEntity | CatsEntity[]> {
     return await this.catsRepository.upsert(CatsEntity, [cat]);
   }
 
   @TransactionDeco()
-  async createMany(cats: CreateCatDto[]): Promise<CatsEntity[]> {
+  async createMany(cats: CreateCatDto[]): Promise<CatsEntity | CatsEntity[]> {
     return await this.catsRepository.upsert(CatsEntity, cats);
   }
 
@@ -33,7 +33,10 @@ export class CatsService {
   }
 
   @TransactionDeco()
-  async update(id: number, cat: UpdateCatDto): Promise<CatsEntity[]> {
+  async update(
+    id: number,
+    cat: UpdateCatDto,
+  ): Promise<CatsEntity | CatsEntity[]> {
     return await this.catsRepository.upsert(CatsEntity, [{ id, ...cat }]);
   }
 
