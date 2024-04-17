@@ -4,7 +4,7 @@ import { TransactionDeco } from 'src/lib/decorators/transaction.decorator';
 import { CatsRepository } from '../db/repositories/cat.repository';
 import { CatsEntity } from 'src/db/entities/cat.entity';
 import { LazyDeco } from 'src/lib/decorators/lazy.decorator';
-import { LazyService } from 'src/lazy/lazy.service';
+import { LazyService, LazyServiceMethods } from 'src/lazy/lazy.service';
 
 @Injectable()
 export class CatsService {
@@ -49,7 +49,7 @@ export class CatsService {
 
   @LazyDeco({
     provider: LazyService,
-    method: 'lazy',
+    method: LazyServiceMethods.lazy,
   })
   async lazy() {
     return { is: true, name: '나나나나' };
