@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { LoginModule } from 'src/login/login.module';
 import { LocalStrategy } from './auth/local/local.strategy';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -22,7 +21,6 @@ import { DiscoveryModule } from '@nestjs/core';
         signOptions: { expiresIn: '5m' },
       }),
     }),
-    LoginModule,
     PassportModule,
     DiscoveryModule,
   ],
