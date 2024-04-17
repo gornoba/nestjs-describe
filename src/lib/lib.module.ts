@@ -8,6 +8,7 @@ import { JwtStrategy } from './auth/jwt/jwt.strategy';
 import { Transaction } from './decorators/transaction.decorator';
 import { AutoAspectExecutor } from './services/auto-aspect-executor';
 import { DiscoveryModule } from '@nestjs/core';
+import { Lazy } from './decorators/lazy.decorator';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { DiscoveryModule } from '@nestjs/core';
     JwtStrategy,
     Transaction,
     AutoAspectExecutor,
+    Lazy,
   ],
-  exports: [JwtSignService, Transaction],
+  exports: [JwtSignService],
 })
 export class LibModule {}

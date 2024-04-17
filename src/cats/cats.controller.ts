@@ -92,7 +92,7 @@ export class CatsController {
     required: true,
     type: Number,
   })
-  @Get(':id')
+  @Get('get/:id')
   findOne(
     @Param('id', new ParseIntPipe()) id: number,
   ): Promise<CatsEntity | CatsEntity[]> {
@@ -108,7 +108,7 @@ export class CatsController {
     description:
       'id는 param으로 변경될 정보는 body로 보내주세요.<br/>변경되는 정보만 보내주셔도 됩니다.',
   })
-  @Put(':id')
+  @Put('put/:id')
   update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateCatDto: UpdateCatDto,
@@ -123,8 +123,13 @@ export class CatsController {
   @ApiOperation({
     summary: '해당 아이디의 고양이를 삭제합니다.',
   })
-  @Delete(':id')
+  @Delete('delete/:id')
   remove(@Param('id', new ParseIntPipe()) id: number): Promise<CatsEntity> {
     return this.catsService.remove(id);
+  }
+
+  @Get('lazy')
+  lazy() {
+    return this.catsService.lazy();
   }
 }

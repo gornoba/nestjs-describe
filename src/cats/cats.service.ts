@@ -3,6 +3,8 @@ import { CatsDto, CreateCatDto, UpdateCatDto } from './dto/cats.dto';
 import { TransactionDeco } from 'src/lib/decorators/transaction.decorator';
 import { CatsRepository } from '../db/repositories/cat.repository';
 import { CatsEntity } from 'src/db/entities/cat.entity';
+import { LazyDeco } from 'src/lib/decorators/lazy.decorator';
+import { LazyService } from 'src/lazy/lazy.service';
 
 @Injectable()
 export class CatsService {
@@ -43,5 +45,13 @@ export class CatsService {
   @TransactionDeco()
   async remove(id: number): Promise<CatsEntity> {
     return await this.catsRepository.delete(CatsEntity, id);
+  }
+
+  @LazyDeco({
+    provider: LazyService,
+    method: 'lazy',
+  })
+  async lazy() {
+    return { is: true, name: '나나나나' };
   }
 }

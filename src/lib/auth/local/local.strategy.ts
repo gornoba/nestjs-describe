@@ -11,7 +11,6 @@ export class LocalStrategy
 {
   private loginService: LoginService;
 
-  // default passport name: 'local'
   constructor(private readonly moduleRef: ModuleRef) {
     super({
       usernameField: 'username', // default: 'username'
