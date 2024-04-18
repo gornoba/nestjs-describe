@@ -1,4 +1,9 @@
-import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  IntersectionType,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, ValidateNested } from 'class-validator';
 import { CatsEntity } from 'src/db/entities/cat.entity';
@@ -23,16 +28,28 @@ export class ArrayCreateCatDto {
   data: CreateCatDto[];
 }
 
-export class CatsDto extends CreateCatDto {
+export class CatsDto extends IntersectionType(CreateCatDto) {
   @ApiProperty({
     description: 'The id of a cat',
     example: 1,
     type: Number,
   })
   id: number;
-
-  constructor(cat: { id: number; name: string; age: number; breed: string }) {
-    super();
-    Object.assign(this, cat);
-  }
 }
+
+export const createCatStub = (): CreateCatDto => ({
+  name: 'Whiskers',
+  age: 5,
+  breed: 'Siames',
+});
+
+export const updateCatStub = (): UpdateCatDto => ({
+  breed: 'foo',
+});
+
+export const catsStub = (): CatsDto => ({
+  id: 1,
+  name: 'Whiskers',
+  age: 5,
+  breed: 'Siames',
+});

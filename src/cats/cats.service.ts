@@ -8,8 +8,6 @@ import { LazyService, LazyServiceMethods } from 'src/lazy/lazy.service';
 
 @Injectable()
 export class CatsService {
-  private readonly cats: CatsDto[] = [];
-
   constructor(private readonly catsRepository: CatsRepository) {}
 
   @TransactionDeco()
@@ -29,7 +27,7 @@ export class CatsService {
 
   @TransactionDeco()
   async findOne(id: number): Promise<CatsEntity> {
-    return (await await this.catsRepository.find(CatsEntity, {
+    return (await this.catsRepository.find(CatsEntity, {
       where: { id },
     })) as CatsEntity;
   }

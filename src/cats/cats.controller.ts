@@ -16,11 +16,14 @@ import {
   UpdateCatDto,
 } from './dto/cats.dto';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiResponse,
   ApiTags,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { SessionGuard } from 'src/lib/auth/session/session.guard';
 import { Role } from 'src/lib/auth/rbac/rbac.role';
