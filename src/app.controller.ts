@@ -1,9 +1,44 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  BeforeApplicationShutdown,
+  Controller,
+  Get,
+  OnApplicationBootstrap,
+  OnApplicationShutdown,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
-export class AppController {
+export class AppController
+  implements
+    OnModuleInit,
+    OnApplicationBootstrap,
+    OnModuleDestroy,
+    BeforeApplicationShutdown,
+    OnApplicationShutdown
+{
   constructor(private readonly appService: AppService) {}
+
+  onModuleInit() {
+    console.log('onModuleInit');
+  }
+
+  onApplicationBootstrap() {
+    console.log('onApplicationBootstrap');
+  }
+
+  onModuleDestroy() {
+    console.log('onModuleDestroy');
+  }
+
+  beforeApplicationShutdown() {
+    console.log('beforeApplicationShutdown');
+  }
+
+  onApplicationShutdown(signal?: string) {
+    console.log('onApplicationShutdown');
+  }
 
   @Get()
   getHello(): string {
