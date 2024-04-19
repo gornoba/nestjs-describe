@@ -12,12 +12,14 @@ import { TypeOrmConfig } from './lib/config/typeorm.conn';
 import { DbModule } from './db/db.module';
 import { ClsModule } from 'nestjs-cls';
 import { UserEntity } from './db/entities/user.entity';
+import { envValidationSchema } from './lib/config/env.validation';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(TypeOrmConfig),
     ConfigModule.forRoot({
       isGlobal: true,
+      validationSchema: envValidationSchema,
     }),
     ClsModule.forRoot({
       global: true,
