@@ -2,27 +2,23 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { join } from 'path';
 
-export const TypeOrmConfig = {
+export const TypeOrmMongoConfig = {
+  name: 'mongo',
   useFactory: async (
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => {
-    const db = JSON.parse(configService.get('POSTGRE'));
+    const db = JSON.parse(configService.get('MONGO'));
+    const { username, password, host, port, database, authSource } = db;
 
-    return {
-      type: 'postgres',
-      host: db.host,
-      port: db.port,
-      username: db.username,
-      password: db.password,
-      database: db.database,
-      schema: db.schema,
-      autoLoadEntities: true,
+    const config: TypeOrmModuleOptions = {
+      type: 'mongodb',
+      url: `mongodb://${username}:${password}@${host}:${port}/${database}?authSource=${authSource}`,
       entities: [
         join(
           __dirname,
           '..',
           '..',
-          'db',
+          'mongoDb',
           'entities',
           '**',
           '*.entity{.ts,.js}',
@@ -31,6 +27,8 @@ export const TypeOrmConfig = {
       synchronize: true,
       logging: ['error'],
     };
+
+    return config;
   },
   inject: [ConfigService],
 };

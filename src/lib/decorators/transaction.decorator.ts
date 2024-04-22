@@ -8,17 +8,22 @@ import {
 } from '../interfaces/lazy-decorator.interface';
 import { createAopDecorator } from './create-aop.decorator';
 import { BadRequestException } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 
 @Aspect(TRANSACTION_CONSTANT)
-export class Transaction implements LazyDecorator<any, any> {
+export class Transaction implements LazyDecorator<any, string> {
   constructor(
+    @InjectDataSource('mongo') private readonly mongoDataSource: DataSource,
     private readonly dataSource: DataSource,
     private readonly cls: ClsService,
   ) {}
 
-  wrap({ method }: WrapParams<any, any>) {
+  wrap({ method, metadata }: WrapParams<any, string>) {
     return async (...args: any) => {
-      const queryRunner = this.dataSource.createQueryRunner();
+      const queryRunner =
+        metadata === 'mongo'
+          ? this.mongoDataSource.createQueryRunner()
+          : this.dataSource.createQueryRunner();
       this.cls.set('transaction', queryRunner.manager);
 
       await queryRunner.connect();
@@ -39,5 +44,5 @@ export class Transaction implements LazyDecorator<any, any> {
   }
 }
 
-export const TransactionDeco = (metadata?: { db?: string }) =>
+export const TransactionDeco = (metadata?: string) =>
   createAopDecorator(TRANSACTION_CONSTANT, metadata);

@@ -1,17 +1,16 @@
-export function currentTime() {
+export function currentTime(value?: Date) {
   // 날짜와 시간을 UTC 기준으로 파싱
-  const date = new Date();
+  const utcDate = value ? new Date(value) : new Date();
+  const kstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
 
   // Intl.DateTimeFormat을 사용하여 서울 시간대로 포맷팅
-  const seoulTime = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    timeZone: 'Asia/Seoul',
-  }).format(date);
+  const year = kstDate.getFullYear();
+  const month = String(kstDate.getMonth() + 1).padStart(2, '0');
+  const day = String(kstDate.getDate()).padStart(2, '0');
+  const hours = String(kstDate.getHours()).padStart(2, '0');
+  const minutes = String(kstDate.getMinutes()).padStart(2, '0');
+  const seconds = String(kstDate.getSeconds()).padStart(2, '0');
+  const milliseconds = String(kstDate.getMilliseconds()).padStart(3, '0');
 
-  return seoulTime;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
 }

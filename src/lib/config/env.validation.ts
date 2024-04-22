@@ -22,6 +22,16 @@ export const envValidationSchema = Joi.object({
       'schema',
     ]),
   ),
+  MONGO: Joi.string().custom((value) =>
+    joiCustom(value, [
+      'host',
+      'port',
+      'username',
+      'password',
+      'database',
+      'authSource',
+    ]),
+  ),
 });
 
 function joiCustom<V = any>(value: V, objKeys: string[]) {

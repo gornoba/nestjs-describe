@@ -10,6 +10,7 @@ services:
     depends_on:
       - redis
       - database
+      - mongo
     volumes:
       - .:/usr/src
       - /usr/src/node_modules
@@ -32,3 +33,27 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+
+  mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./mongo-data:/data/db
+    ports:
+      - '27017:27017'
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_BASICAUTH_USERNAME: user
+      ME_CONFIG_BASICAUTH_PASSWORD: abcd
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017
+      ME_CONFIG_BASICAUTH: true
+    depends_on:
+      - mongo
