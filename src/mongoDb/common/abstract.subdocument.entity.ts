@@ -1,25 +1,20 @@
-import { Transform } from 'class-transformer';
-import { currentTime } from 'src/lib/util/koreatime.util';
+import { ObjectId } from 'mongodb';
 import { Column, Entity } from 'typeorm';
+import { AbstractMongoEntity } from './abstract.document.entity';
 
 @Entity()
-export class AbstractSubDocumentEntity {
+export class AbstractSubDocumentEntity extends AbstractMongoEntity {
   @Column({ type: 'bool' })
   active: boolean;
 
-  @Column({ type: 'timestamp' })
-  @Transform(({ value }) => currentTime(value))
-  createdAt: Date;
-
-  @Column({ type: 'timestamp' })
-  @Transform(({ value }) => currentTime(value))
-  updatedAt: Date;
-
   constructor(
+    _id: ObjectId = new ObjectId(),
     active: boolean = true,
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
   ) {
+    super();
+    this._id = _id;
     this.active = active;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
