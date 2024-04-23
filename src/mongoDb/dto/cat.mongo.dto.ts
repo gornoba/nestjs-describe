@@ -16,3 +16,10 @@ export class ObjectIdDto {
   @IsMongoId()
   id: string;
 }
+
+export const catMongoStub = () => ({
+  id: '6625f932f0bdee85de4bfadd',
+  name: 'Kitty',
+  age: 3,
+  breed: 'Scottish Fold',
+});
