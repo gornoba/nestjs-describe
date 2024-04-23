@@ -15,7 +15,9 @@ import { UserEntity } from './db/entities/user.entity';
 import { envValidationSchema } from './lib/config/env.validation';
 import { TypeOrmMongoConfig } from './lib/config/typeorm.mongo';
 import { MongoModule } from './mongoDb/mongo.module';
-
+import { CacheModule } from '@nestjs/cache-manager';
+import { cacheModuleOptions } from './lib/config/cache.config';
+import { RedisClientOptions } from 'redis';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(TypeOrmConfig),
@@ -40,6 +42,7 @@ import { MongoModule } from './mongoDb/mongo.module';
         },
       },
     }),
+    CacheModule.registerAsync<RedisClientOptions>(cacheModuleOptions),
     CatsModule,
     LibModule,
     LoginModule,

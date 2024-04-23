@@ -9,6 +9,7 @@ import { Transaction } from './decorators/transaction.decorator';
 import { AutoAspectExecutor } from './services/auto-aspect-executor';
 import { DiscoveryModule } from '@nestjs/core';
 import { Lazy } from './decorators/lazy.decorator';
+import { CacheDecoFn } from './decorators/cache.decorator';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { Lazy } from './decorators/lazy.decorator';
     JwtSignService,
     JwtStrategy,
     Transaction,
+    CacheDecoFn,
     AutoAspectExecutor,
     Lazy,
   ],

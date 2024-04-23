@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CatsDto, CreateCatDto, UpdateCatDto } from './dto/cats.dto';
+import { CreateCatDto, UpdateCatDto } from './dto/cats.dto';
 import { TransactionDeco } from 'src/lib/decorators/transaction.decorator';
 import { CatsRepository } from '../db/repositories/cat.repository';
 import { CatsEntity } from 'src/db/entities/cat.entity';

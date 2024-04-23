@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   CatsDto,
@@ -27,13 +28,18 @@ import { Role } from 'src/lib/auth/rbac/rbac.role';
 import { Auth } from 'src/lib/decorators/auth.decorator';
 import { CatsService } from './cats.service';
 import { CatsEntity } from 'src/db/entities/cat.entity';
+import { CatsCacheService } from './cats-cache.service';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('cats')
 @UseGuards(SessionGuard)
 @Auth(Role.Admin)
 @Controller('cats')
 export class CatsController {
-  constructor(private readonly catsService: CatsService) {}
+  constructor(
+    private readonly catsService: CatsService,
+    private readonly catsCacheService: CatsCacheService,
+  ) {}
 
   @ApiCreatedResponse({
     description: '생성된 고양이를 반환합니다.',
@@ -74,6 +80,8 @@ export class CatsController {
   @ApiOperation({
     summary: '모든 고양이를 반환합니다.',
   })
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(10)
   @Get()
   findAll() {
     return this.catsService.findAll();
@@ -93,10 +101,20 @@ export class CatsController {
     type: Number,
   })
   @Get('get/:id')
-  findOne(
+  async findOne(
     @Param('id', new ParseIntPipe()) id: number,
   ): Promise<CatsEntity | CatsEntity[]> {
-    return this.catsService.findOne(id);
+    const cacheData = (await this.catsCacheService.findOne(
+      id,
+    )) as unknown as CatsEntity;
+
+    if (!cacheData) {
+      const result = await this.catsService.findOne(id);
+      await this.catsCacheService.wrap(id, result);
+      return result;
+    }
+
+    return cacheData;
   }
 
   @ApiOkResponse({
