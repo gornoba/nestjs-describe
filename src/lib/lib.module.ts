@@ -10,6 +10,7 @@ import { AutoAspectExecutor } from './services/auto-aspect-executor';
 import { DiscoveryModule } from '@nestjs/core';
 import { Lazy } from './decorators/lazy.decorator';
 import { CacheDecoFn } from './decorators/cache.decorator';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Module({
   imports: [
@@ -34,7 +35,11 @@ import { CacheDecoFn } from './decorators/cache.decorator';
     CacheDecoFn,
     AutoAspectExecutor,
     Lazy,
+    {
+      provide: AsyncLocalStorage,
+      useValue: new AsyncLocalStorage(),
+    },
   ],
-  exports: [JwtSignService],
+  exports: [JwtSignService, AsyncLocalStorage],
 })
 export class LibModule {}

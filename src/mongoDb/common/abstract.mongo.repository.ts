@@ -1,4 +1,3 @@
-import { ClsService } from 'nestjs-cls';
 import { AbstractMongoEntity } from './abstract.document.entity';
 import {
   DeepPartial,
@@ -8,27 +7,26 @@ import {
   FindManyOptions,
 } from 'typeorm';
 import { ObjectId } from 'mongodb';
+import { transactionQueryRunner } from 'src/lib/decorators/transaction.decorator';
 
 export abstract class AbstractMongoRepository<T extends AbstractMongoEntity> {
-  constructor(private readonly cls: ClsService) {}
-
   async findAll(
     mongoEntity: EntityTarget<T>,
     options?: FindManyOptions<T> | Partial<T> | FilterOperators<T>,
   ): Promise<T[]> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
+    const queryRunner: EntityManager = transactionQueryRunner();
     return queryRunner.getMongoRepository(mongoEntity).find(options);
   }
 
   async findOne(mongoEntity: EntityTarget<T>, id: string): Promise<T | null> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
+    const queryRunner: EntityManager = transactionQueryRunner();
     return queryRunner.getMongoRepository(mongoEntity).findOne({
       where: { _id: new ObjectId(id) },
     });
   }
 
   async create(mongoEntity: EntityTarget<T>, body: DeepPartial<T>): Promise<T> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
+    const queryRunner: EntityManager = transactionQueryRunner();
     const result = await queryRunner.getMongoRepository(mongoEntity).save(body);
     const idTransform = {
       ...result,
@@ -43,7 +41,7 @@ export abstract class AbstractMongoRepository<T extends AbstractMongoEntity> {
     acknowledged: boolean;
     deletedCount: number;
   }> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
+    const queryRunner: EntityManager = transactionQueryRunner();
     return queryRunner.getMongoRepository(mongoEntity).deleteMany({});
   }
 
@@ -54,13 +52,13 @@ export abstract class AbstractMongoRepository<T extends AbstractMongoEntity> {
     acknowledged: boolean;
     deletedCount: number;
   }> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
+    const queryRunner: EntityManager = transactionQueryRunner();
     return queryRunner
       .getMongoRepository(mongoEntity)
       .deleteOne({ _id: new ObjectId(id) });
   }
 
   queryRunner(): EntityManager {
-    return this.cls.get('transaction');
+    return transactionQueryRunner();
   }
 }

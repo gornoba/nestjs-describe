@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   UseInterceptors,
+  Logger,
 } from '@nestjs/common';
 import {
   CatsDto,
@@ -30,12 +31,14 @@ import { CatsService } from './cats.service';
 import { CatsEntity } from 'src/db/entities/cat.entity';
 import { CatsCacheService } from './cats-cache.service';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { Cron } from '@nestjs/schedule';
 
 @ApiTags('cats')
 @UseGuards(SessionGuard)
-@Auth(Role.Admin)
+@Auth(Role.User)
 @Controller('cats')
 export class CatsController {
+  private readonly logger = new Logger(CatsController.name);
   constructor(
     private readonly catsService: CatsService,
     private readonly catsCacheService: CatsCacheService,
@@ -67,10 +70,10 @@ export class CatsController {
       '고양이 정보를 `data: CreateCatDto[]` 형식으로 `body`를 보내세요.',
   })
   @Post('many')
-  createMany(
+  async createMany(
     @Body() createCatDto: ArrayCreateCatDto,
   ): Promise<CatsEntity | CatsEntity[]> {
-    return this.catsService.createMany(createCatDto.data);
+    return await this.catsService.createMany(createCatDto.data);
   }
 
   @ApiOkResponse({
@@ -82,9 +85,16 @@ export class CatsController {
   })
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(10)
+  @Cron('0 0 */1 * * *', {
+    name: 'cats-all',
+    timeZone: 'Asia/Seoul',
+  })
   @Get()
-  findAll() {
-    return this.catsService.findAll();
+  async findAll() {
+    const result = await this.catsService.findAll();
+
+    this.logger.log(result);
+    return result;
   }
 
   @ApiOkResponse({
@@ -127,11 +137,11 @@ export class CatsController {
       'id는 param으로 변경될 정보는 body로 보내주세요.<br/>변경되는 정보만 보내주셔도 됩니다.',
   })
   @Put('put/:id')
-  update(
+  async update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateCatDto: UpdateCatDto,
   ): Promise<CatsEntity | CatsEntity[]> {
-    return this.catsService.update(id, updateCatDto);
+    return await this.catsService.update(id, updateCatDto);
   }
 
   @ApiOkResponse({
@@ -142,8 +152,10 @@ export class CatsController {
     summary: '해당 아이디의 고양이를 삭제합니다.',
   })
   @Delete('delete/:id')
-  remove(@Param('id', new ParseIntPipe()) id: number): Promise<CatsEntity> {
-    return this.catsService.remove(id);
+  async remove(
+    @Param('id', new ParseIntPipe()) id: number,
+  ): Promise<CatsEntity> {
+    return await this.catsService.remove(id);
   }
 
   @Get('lazy')

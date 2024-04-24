@@ -6,17 +6,18 @@ import {
   EntityTarget,
   FindManyOptions,
 } from 'typeorm';
-import { ClsService } from 'nestjs-cls';
 import { UserEntity } from '../entities/user.entity';
+import { transactionQueryRunner } from 'src/lib/decorators/transaction.decorator';
+import { AsyncLocalStorage } from 'async_hooks';
 
 export abstract class AbstractRepository<T extends AbstractEntity> {
-  constructor(protected readonly cls: ClsService) {}
+  constructor(private readonly als: AsyncLocalStorage<any>) {}
 
   async find(
     entity: EntityTarget<T>,
     options?: FindManyOptions,
   ): Promise<T[] | T | UserEntity> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
+    const queryRunner: EntityManager = transactionQueryRunner();
     const repository = queryRunner.getRepository<T>(entity);
     const result = await repository.find(options);
 
@@ -31,8 +32,9 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
     entity: EntityTarget<T>,
     data: DeepPartial<T[]>,
   ): Promise<T[] | T> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
-    const userInfo = this.cls.get('userId');
+    const queryRunner: EntityManager = transactionQueryRunner();
+    const als = this.als.getStore();
+
     const repository = queryRunner.getRepository<T>(entity);
     const tmpArr = [];
 
@@ -57,9 +59,9 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
       }
     }
 
-    if (userInfo) {
+    if (als && als['userInfo']) {
       tmpArr.forEach((item) => {
-        item.user = userInfo;
+        item.user = als['userInfo'];
       });
     }
     const result = await repository.save(tmpArr);
@@ -67,7 +69,7 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
   }
 
   async delete(entity: EntityTarget<T>, id: number): Promise<T> {
-    const queryRunner: EntityManager = this.cls.get('transaction');
+    const queryRunner: EntityManager = transactionQueryRunner();
     const repository = queryRunner.getRepository<T>(entity);
     const findOne = (await this.find(entity, {
       where: { id },
@@ -81,6 +83,6 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
   }
 
   createQueryBuilder(): EntityManager {
-    return this.cls.get('transaction');
+    return transactionQueryRunner();
   }
 }

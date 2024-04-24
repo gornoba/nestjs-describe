@@ -4,6 +4,7 @@ import { CatsEntity } from './cat.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Role } from 'src/lib/auth/rbac/rbac.role';
 
 @Entity({
   name: 'users',
@@ -29,7 +30,7 @@ export class UserEntity extends AbstractEntity {
 
   @Column({
     type: 'simple-array',
-    default: ['user'],
+    default: Role.User,
   })
   @IsOptional()
   @IsArray()
