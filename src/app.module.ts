@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
 import { LibModule } from './lib/lib.module';
 import { LoginModule } from './login/login.module';
@@ -19,6 +18,10 @@ import { cacheModuleOptions } from './lib/config/cache.config';
 import { RedisClientOptions } from 'redis';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CronModule } from './cron/cron.module';
+import { NextFunction, Request, Response } from 'express';
+import { RequestMiddleware } from './lib/middlewares/request.middleware';
+import { AppService } from './app.service';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(TypeOrmConfig),
@@ -29,6 +32,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     CacheModule.registerAsync<RedisClientOptions>(cacheModuleOptions),
     ScheduleModule.forRoot(),
+    CronModule,
     CatsModule,
     LibModule,
     LoginModule,
@@ -48,8 +52,15 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes(CatsController);
     consumer
-      .apply((req, res, next) => {
-        const session = req.session;
+      .apply((req: Request, res: Response, next: NextFunction) => {
+        const session = req.session as any;
+
+        // session 초기화
+        if (!session?.isInitialized && /^\/api/.test(req.baseUrl)) {
+          session.isInitialized = true;
+        }
+
+        // async local storage에 user 정보 저장
         if (session?.user) {
           const userEntity = new UserEntity({
             id: session.user.id,
@@ -63,5 +74,6 @@ export class AppModule implements NestModule {
         }
       })
       .forRoutes('*');
+    consumer.apply(RequestMiddleware).forRoutes('*');
   }
 }

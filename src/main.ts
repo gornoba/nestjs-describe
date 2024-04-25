@@ -18,6 +18,8 @@ import { ResponseInterceptor } from './lib/interceptors/response.interceptor';
 import { TimeoutInterceptor } from './lib/interceptors/timeout.interceptor';
 import { HttpExceptionFilter } from './lib/exceptions/http-exception.filter';
 import { AllExceptionsFilter } from './lib/exceptions/all-exception.filter';
+import { LatencyInterceptor } from './lib/interceptors/latency.interceptor';
+import { LatencyRepository } from './db/repositories/latency.repository';
 
 dotenv.config();
 
@@ -124,14 +126,18 @@ class Application {
       new ClassSerializerInterceptor(this.server.get(Reflector)),
     );
 
+    const latencyRepository =
+      this.server.get<LatencyRepository>(LatencyRepository);
+
     this.server.useGlobalInterceptors(
       new ResponseInterceptor(),
+      new LatencyInterceptor(latencyRepository),
       new TimeoutInterceptor(),
     );
 
     this.server.useGlobalFilters(
-      new AllExceptionsFilter(),
       new HttpExceptionFilter(),
+      new AllExceptionsFilter(),
     );
 
     this.server.use(cookieParser());

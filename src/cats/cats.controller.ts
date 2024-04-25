@@ -30,7 +30,7 @@ import { Auth } from 'src/lib/decorators/auth.decorator';
 import { CatsService } from './cats.service';
 import { CatsEntity } from 'src/db/entities/cat.entity';
 import { CatsCacheService } from './cats-cache.service';
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { Cron } from '@nestjs/schedule';
 
 @ApiTags('cats')
@@ -83,8 +83,6 @@ export class CatsController {
   @ApiOperation({
     summary: '모든 고양이를 반환합니다.',
   })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(10)
   @Cron('0 0 */1 * * *', {
     name: 'cats-all',
     timeZone: 'Asia/Seoul',
@@ -92,8 +90,6 @@ export class CatsController {
   @Get()
   async findAll() {
     const result = await this.catsService.findAll();
-
-    this.logger.log(result);
     return result;
   }
 
@@ -110,6 +106,9 @@ export class CatsController {
     required: true,
     type: Number,
   })
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('getCat')
+  @CacheTTL(10)
   @Get('get/:id')
   async findOne(
     @Param('id', new ParseIntPipe()) id: number,
