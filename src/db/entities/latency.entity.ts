@@ -14,7 +14,7 @@ export class LatencyEntity extends AbstractEntity {
   @Column({
     type: 'varchar',
   })
-  url: string;
+  method_url: string;
 
   @Column({
     type: 'int',

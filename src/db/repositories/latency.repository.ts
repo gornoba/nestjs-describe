@@ -14,20 +14,20 @@ export class LatencyRepository {
     return await this.latencyRepository.save(data);
   }
 
-  async meanLatency(url: string) {
+  async meanLatency(method_url: string) {
     const today = new Date();
     const result = await this.latencyRepository
       .createQueryBuilder('latency')
-      .select('FLOOR(AVG(latency.latency))', 'mean')
+      .select('STDDEV(latency.latency)', 'stddev')
       .where(
         `latency.createdAt between :today::timestamp - interval '1' day AND :today::timestamp`,
         {
           today,
         },
       )
-      .andWhere('latency.url = :url', { url })
+      .andWhere('latency.method_url = :method_url', { method_url })
       .getRawOne();
 
-    return parseInt(result.mean, 0) || 100;
+    return parseInt(result.stddev, 0) || 100;
   }
 }
