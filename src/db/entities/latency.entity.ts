@@ -4,7 +4,7 @@ import { AbstractEntity } from '../common/abstract.entity';
 @Entity({
   name: 'latency',
 })
-@Index(['url', 'createdAt'])
+@Index(['method_url', 'createdAt'])
 export class LatencyEntity extends AbstractEntity {
   @Column({
     type: 'varchar',

@@ -32,6 +32,8 @@ import { CatsEntity } from 'src/db/entities/cat.entity';
 import { CatsCacheService } from './cats-cache.service';
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { Cron } from '@nestjs/schedule';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @ApiTags('cats')
 @UseGuards(SessionGuard)
@@ -42,6 +44,7 @@ export class CatsController {
   constructor(
     private readonly catsService: CatsService,
     private readonly catsCacheService: CatsCacheService,
+    @InjectQueue('cats') private catsQueue: Queue,
   ) {}
 
   @ApiCreatedResponse({
@@ -89,8 +92,12 @@ export class CatsController {
   })
   @Get()
   async findAll() {
-    const result = await this.catsService.findAll();
-    return result;
+    const result = await this.catsQueue.add(
+      'findAll',
+      'findAll',
+      {}, // 추가옵션이 있다면
+    );
+    return await result.finished();
   }
 
   @ApiOkResponse({

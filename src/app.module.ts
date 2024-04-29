@@ -22,6 +22,8 @@ import { CronModule } from './cron/cron.module';
 import { NextFunction, Request, Response } from 'express';
 import { RequestMiddleware } from './lib/middlewares/request.middleware';
 import { AppService } from './app.service';
+import { BullModule } from '@nestjs/bull';
+import { bullModuleOptions } from './lib/config/queue.config';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(TypeOrmConfig),
@@ -32,6 +34,7 @@ import { AppService } from './app.service';
     }),
     CacheModule.registerAsync<RedisClientOptions>(cacheModuleOptions),
     ScheduleModule.forRoot(),
+    BullModule.forRootAsync(bullModuleOptions),
     CronModule,
     CatsModule,
     LibModule,

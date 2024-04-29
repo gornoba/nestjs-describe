@@ -28,7 +28,7 @@ export class LatencyInterceptor implements NestInterceptor {
           const elapsedTime: number = performance.now() - start;
           const entity = new LatencyEntity();
           entity.sessionId = sessionId;
-          entity.url = url;
+          entity.method_url = `${method}-${url}`;
           entity.latency = Math.floor(elapsedTime);
 
           this.latencyRepository
