@@ -32,5 +32,4 @@ export const bullModuleOptions = {
     };
   },
   inject: [ConfigService],
-  isGlobal: true,
 };
