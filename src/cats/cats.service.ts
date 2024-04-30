@@ -5,10 +5,14 @@ import { CatsRepository } from '../db/repositories/cat.repository';
 import { CatsEntity } from 'src/db/entities/cat.entity';
 import { LazyDeco } from 'src/lib/decorators/lazy.decorator';
 import { LazyService, LazyServiceMethods } from 'src/lazy/lazy.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CatsService {
-  constructor(private readonly catsRepository: CatsRepository) {}
+  constructor(
+    private readonly catsRepository: CatsRepository,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   @TransactionDeco()
   async create(cat: CreateCatDto): Promise<CatsEntity | CatsEntity[]> {
@@ -43,6 +47,10 @@ export class CatsService {
   @TransactionDeco()
   async remove(id: number): Promise<CatsEntity> {
     return await this.catsRepository.delete(CatsEntity, id);
+  }
+
+  async updateEmit(id: number, cat: UpdateCatDto) {
+    this.eventEmitter.emit('cat.updated', { id, ...cat });
   }
 
   @LazyDeco({

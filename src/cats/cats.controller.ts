@@ -150,6 +150,14 @@ export class CatsController {
     return await this.catsService.update(id, updateCatDto);
   }
 
+  @Put('pu-emit/:id')
+  async updateEmit(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() updateCatDto: UpdateCatDto,
+  ) {
+    await this.catsService.updateEmit(id, updateCatDto);
+  }
+
   @ApiOkResponse({
     description: '모든 고양이를 반환합니다.',
     type: CatsDto,

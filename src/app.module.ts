@@ -24,6 +24,7 @@ import { RequestMiddleware } from './lib/middlewares/request.middleware';
 import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bull';
 import { bullModuleOptions } from './lib/config/queue.config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(TypeOrmConfig),
@@ -35,6 +36,9 @@ import { bullModuleOptions } from './lib/config/queue.config';
     CacheModule.registerAsync<RedisClientOptions>(cacheModuleOptions),
     ScheduleModule.forRoot(),
     BullModule.forRootAsync(bullModuleOptions),
+    EventEmitterModule.forRoot({
+      maxListeners: 10,
+    }),
     CronModule,
     CatsModule,
     LibModule,
