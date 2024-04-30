@@ -44,6 +44,8 @@ class Application {
     host: string;
     port: number;
   };
+  private cookieSign: string;
+  private cookieSecret: string;
 
   constructor(private server: NestExpressApplication) {
     this.server = server;
@@ -65,6 +67,8 @@ class Application {
       ? JSON.parse(process.env.SWAGGER_AUTH)
       : { user: 'admin', password: '123' };
     this.redis = JSON.parse(process.env.REDIS);
+    this.cookieSign = process.env.COOKIE_SIGN;
+    this.cookieSecret = process.env.COOKIE_SECRET;
   }
 
   private policy() {
@@ -139,8 +143,7 @@ class Application {
       new HttpExceptionFilter(),
       new AllExceptionsFilter(),
     );
-
-    this.server.use(cookieParser());
+    this.server.use(cookieParser(this.cookieSign));
   }
 
   private swaggerAuth() {

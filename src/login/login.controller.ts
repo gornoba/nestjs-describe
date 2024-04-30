@@ -54,4 +54,16 @@ export class LoginController {
   async loginSession(@Req() req: Request): Promise<string> {
     return this.loginService.setSession(req, req.user as UsersDto);
   }
+
+  @Get('cookie-set')
+  async cookieSet(@Res({ passthrough: true }) res: Response) {
+    this.loginService.setSignedCookie(res, 'test', 'cookie');
+    return '쿠키 설정 완료';
+  }
+
+  @Get('cookie-get')
+  async cookieGet(@Req() req: Request) {
+    const result = this.loginService.getCookie(req);
+    return result;
+  }
 }
