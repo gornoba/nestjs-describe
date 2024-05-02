@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateCatDto, UpdateCatDto } from './dto/cats.dto';
 import { TransactionDeco } from 'src/lib/decorators/transaction.decorator';
 import { CatsRepository } from '../db/repositories/cat.repository';
@@ -6,13 +6,40 @@ import { CatsEntity } from 'src/db/entities/cat.entity';
 import { LazyDeco } from 'src/lib/decorators/lazy.decorator';
 import { LazyService, LazyServiceMethods } from 'src/lazy/lazy.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CustomEmitterService } from 'src/lib/services/custom-emiter';
 
 @Injectable()
-export class CatsService {
+export class CatsService implements OnModuleInit {
   constructor(
     private readonly catsRepository: CatsRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly customEmitterService: CustomEmitterService,
   ) {}
+
+  onModuleInit() {
+    this.customEmitterService.getEventObservable().subscribe({
+      next: async (data) => {
+        if (typeof data.payload === 'string') {
+          const payload = data.payload as string;
+          const payloadSplit = payload.split(/\./);
+
+          if (
+            payloadSplit[0] === CatsService.name &&
+            this[payloadSplit[1]] instanceof Function
+          ) {
+            const result = await this[payloadSplit[1]]();
+            this.customEmitterService.handleMessage({
+              sessionId: data.sessionId,
+              payload: result,
+            });
+          }
+        }
+      },
+      error: (error) => {
+        this.customEmitterService.handleError(error);
+      },
+    });
+  }
 
   @TransactionDeco()
   async create(cat: CreateCatDto): Promise<CatsEntity | CatsEntity[]> {

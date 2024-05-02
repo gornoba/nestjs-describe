@@ -10,6 +10,8 @@ import {
   UseGuards,
   UseInterceptors,
   Logger,
+  Session,
+  Res,
 } from '@nestjs/common';
 import {
   CatsDto,
@@ -34,6 +36,9 @@ import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { Cron } from '@nestjs/schedule';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { CustomEmitterService } from '../lib/services/custom-emiter';
+import { Response } from 'express';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @ApiTags('cats')
 @UseGuards(SessionGuard)
@@ -45,6 +50,8 @@ export class CatsController {
     private readonly catsService: CatsService,
     private readonly catsCacheService: CatsCacheService,
     @InjectQueue('cats') private catsQueue: Queue,
+    private readonly customEmitterService: CustomEmitterService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @ApiCreatedResponse({
@@ -155,7 +162,7 @@ export class CatsController {
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateCatDto: UpdateCatDto,
   ) {
-    await this.catsService.updateEmit(id, updateCatDto);
+    this.eventEmitter.emit('cat.updated', { id, updateCatDto });
   }
 
   @ApiOkResponse({
@@ -175,5 +182,19 @@ export class CatsController {
   @Get('lazy')
   lazy() {
     return this.catsService.lazy();
+  }
+
+  @Get('custom-emit')
+  async customEmit(
+    @Session() session: Record<string, any>,
+    @Res() res: Response,
+  ) {
+    this.customEmitterService.handleMessage(
+      {
+        sessionId: session.id,
+        payload: 'CatsService.findAll',
+      },
+      res,
+    );
   }
 }

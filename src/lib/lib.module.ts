@@ -11,6 +11,7 @@ import { DiscoveryModule } from '@nestjs/core';
 import { Lazy } from './decorators/lazy.decorator';
 import { CacheDecoFn } from './decorators/cache.decorator';
 import { AsyncLocalStorage } from 'async_hooks';
+import { CustomEmitterService } from './services/custom-emiter';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { AsyncLocalStorage } from 'async_hooks';
       provide: AsyncLocalStorage,
       useValue: new AsyncLocalStorage(),
     },
+    CustomEmitterService,
   ],
-  exports: [JwtSignService, AsyncLocalStorage],
+  exports: [JwtSignService, AsyncLocalStorage, CustomEmitterService],
 })
 export class LibModule {}
