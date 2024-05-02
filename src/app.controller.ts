@@ -21,23 +21,23 @@ export class AppController
   constructor(private readonly appService: AppService) {}
 
   onModuleInit() {
-    console.log('onModuleInit');
+    // console.log('onModuleInit');
   }
 
   onApplicationBootstrap() {
-    console.log('onApplicationBootstrap');
+    // console.log('onApplicationBootstrap');
   }
 
   onModuleDestroy() {
-    console.log('onModuleDestroy');
+    // console.log('onModuleDestroy');
   }
 
   beforeApplicationShutdown() {
-    console.log('beforeApplicationShutdown');
+    // console.log('beforeApplicationShutdown');
   }
 
   onApplicationShutdown(signal?: string) {
-    console.log('onApplicationShutdown');
+    // console.log('onApplicationShutdown');
   }
 
   @Get()

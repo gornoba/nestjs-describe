@@ -19,15 +19,15 @@ export class CatsService implements OnModuleInit {
   onModuleInit() {
     this.customEmitterService.getEventObservable().subscribe({
       next: async (data) => {
-        if (typeof data.payload === 'string') {
-          const payload = data.payload as string;
-          const payloadSplit = payload.split(/\./);
+        if (data?.subject) {
+          const subject = data.subject as string;
+          const subjectSplit = subject.split(/\./);
 
           if (
-            payloadSplit[0] === CatsService.name &&
-            this[payloadSplit[1]] instanceof Function
+            subjectSplit[0] === CatsService.name &&
+            this[subjectSplit[1]] instanceof Function
           ) {
-            const result = await this[payloadSplit[1]]();
+            const result = await this[subjectSplit[1]]();
             this.customEmitterService.handleMessage({
               sessionId: data.sessionId,
               payload: result,

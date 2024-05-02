@@ -4,15 +4,19 @@ import { Subject, Observable } from 'rxjs';
 
 export interface EventData {
   sessionId: string;
-  payload: any;
+  subject?: string;
+  payload?: any;
 }
 
 @Injectable()
 export class CustomEmitterService {
   private readonly logger = new Logger(CustomEmitterService.name);
   private eventSubject = new Subject<EventData>();
+  private activeSubscriptions = 0;
+  private maxSubscriptions = 10;
 
   getEventObservable(): Observable<EventData> {
+    this.activeSubscriptions++;
     return this.eventSubject.asObservable();
   }
 
@@ -20,16 +24,24 @@ export class CustomEmitterService {
     this.eventSubject.next(data);
 
     if (res) {
-      this.getEventObservable().subscribe({
+      const subscribe = this.getEventObservable().subscribe({
         next: (resData) => {
-          const result = { success: true, data: null };
-          if (resData.sessionId === data.sessionId) {
-            result.data = resData.payload;
+          if (this.activeSubscriptions > this.maxSubscriptions) {
+            res
+              .status(HttpStatus.TOO_MANY_REQUESTS)
+              .send({ success: false, message: 'Too many listeners' });
+          } else {
+            const result = { success: true, data: null };
+            if (resData.sessionId === data.sessionId) {
+              result.data = resData.payload;
+            }
+            subscribe.unsubscribe();
+            this.activeSubscriptions--;
+            res.status(HttpStatus.OK).send(result);
           }
-          this.complete();
-          res.status(HttpStatus.OK).send(result);
         },
         error: (error) => {
+          this.activeSubscriptions--;
           this.handleError(error);
         },
       });

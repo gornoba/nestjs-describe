@@ -192,7 +192,7 @@ export class CatsController {
     this.customEmitterService.handleMessage(
       {
         sessionId: session.id,
-        payload: 'CatsService.findAll',
+        subject: 'CatsService.findAll',
       },
       res,
     );

@@ -27,7 +27,7 @@ export class TimeoutInterceptor implements NestInterceptor {
       }),
       finalize(() => {
         // resource를 정리하는 로직
-        console.log('Cleaning up resources...');
+        // console.log('Cleaning up resources...');
       }),
     );
   }
