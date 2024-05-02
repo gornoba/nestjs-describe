@@ -20,6 +20,7 @@ import { HttpExceptionFilter } from './lib/exceptions/http-exception.filter';
 import { AllExceptionsFilter } from './lib/exceptions/all-exception.filter';
 import { LatencyInterceptor } from './lib/interceptors/latency.interceptor';
 import { LatencyRepository } from './db/repositories/latency.repository';
+import compression from 'compression';
 
 dotenv.config();
 
@@ -89,6 +90,10 @@ class Application {
     });
 
     this.server.setGlobalPrefix('api');
+
+    this.server.use(cookieParser(this.cookieSign));
+
+    this.server.use(compression());
   }
 
   private session() {
@@ -143,7 +148,6 @@ class Application {
       new HttpExceptionFilter(),
       new AllExceptionsFilter(),
     );
-    this.server.use(cookieParser(this.cookieSign));
   }
 
   private swaggerAuth() {
