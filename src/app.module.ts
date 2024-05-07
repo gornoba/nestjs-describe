@@ -13,9 +13,8 @@ import { UserEntity } from './db/entities/user.entity';
 import { envValidationSchema } from './lib/config/env.validation';
 import { TypeOrmMongoConfig } from './lib/config/typeorm.mongo';
 import { MongoModule } from './mongoDb/mongo.module';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheModule, CacheModuleOptions } from '@nestjs/cache-manager';
 import { cacheModuleOptions } from './lib/config/cache.config';
-import { RedisClientOptions } from 'redis';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronModule } from './cron/cron.module';
@@ -25,6 +24,7 @@ import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bull';
 import { bullModuleOptions } from './lib/config/queue.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { FileModule } from './file/file.module';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync(TypeOrmConfig),
@@ -33,7 +33,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       isGlobal: true,
       validationSchema: envValidationSchema,
     }),
-    CacheModule.registerAsync<RedisClientOptions>(cacheModuleOptions),
+    CacheModule.registerAsync<CacheModuleOptions>(cacheModuleOptions),
     ScheduleModule.forRoot(),
     BullModule.forRootAsync(bullModuleOptions),
     EventEmitterModule.forRoot({
@@ -45,6 +45,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     LoginModule,
     DbModule,
     MongoModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
