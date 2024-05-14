@@ -12,6 +12,7 @@ import { Lazy } from './decorators/lazy.decorator';
 import { CacheDecoFn } from './decorators/cache.decorator';
 import { AsyncLocalStorage } from 'async_hooks';
 import { CustomEmitterService } from './services/custom-emiter';
+import { ImageOptimizeService } from './services/image-optimize';
 
 @Module({
   imports: [
@@ -41,7 +42,13 @@ import { CustomEmitterService } from './services/custom-emiter';
       useValue: new AsyncLocalStorage(),
     },
     CustomEmitterService,
+    ImageOptimizeService,
   ],
-  exports: [JwtSignService, AsyncLocalStorage, CustomEmitterService],
+  exports: [
+    JwtSignService,
+    AsyncLocalStorage,
+    CustomEmitterService,
+    ImageOptimizeService,
+  ],
 })
 export class LibModule {}
