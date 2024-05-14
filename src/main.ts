@@ -21,6 +21,7 @@ import { AllExceptionsFilter } from './lib/exceptions/all-exception.filter';
 import { LatencyInterceptor } from './lib/interceptors/latency.interceptor';
 import { LatencyRepository } from './db/repositories/latency.repository';
 import compression from 'compression';
+import { join } from 'path';
 
 dotenv.config();
 
@@ -148,6 +149,10 @@ class Application {
       new HttpExceptionFilter(),
       new AllExceptionsFilter(),
     );
+
+    this.server.useStaticAssets(join(__dirname, '..', 'public'));
+    this.server.setBaseViewsDir(join(__dirname, '..', 'views'));
+    this.server.setViewEngine('hbs');
   }
 
   private swaggerAuth() {
