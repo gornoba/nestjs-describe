@@ -1,4 +1,5 @@
 FROM node:alpine As development
+RUN apk add --no-cache python3 make g++
 WORKDIR /usr/src
 COPY package*.json ./
 RUN npm install

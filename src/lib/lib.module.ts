@@ -13,6 +13,7 @@ import { CacheDecoFn } from './decorators/cache.decorator';
 import { AsyncLocalStorage } from 'async_hooks';
 import { CustomEmitterService } from './services/custom-emiter';
 import { ImageOptimizeService } from './services/image-optimize';
+import { FirebaseConfigProvier } from './config/firebase-config.config';
 
 @Module({
   imports: [
@@ -43,12 +44,14 @@ import { ImageOptimizeService } from './services/image-optimize';
     },
     CustomEmitterService,
     ImageOptimizeService,
+    FirebaseConfigProvier,
   ],
   exports: [
     JwtSignService,
     AsyncLocalStorage,
     CustomEmitterService,
     ImageOptimizeService,
+    FirebaseConfigProvier,
   ],
 })
 export class LibModule {}

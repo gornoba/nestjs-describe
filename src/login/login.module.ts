@@ -8,6 +8,9 @@ import { GoogleLoginController } from './social/google-login.controller';
 import { KakaoLoginController } from './social/kakao-login.controller';
 import { NaverLoginController } from './social/naver-login.controller';
 import { SocialLoginService } from './social-login.service';
+import { FirebaseAccountService } from './firebase/firebase.account.service';
+import { LoginFirebaseController } from './login-firebase.controller';
+import { FirebaeLoginService } from './firebase/firebae-login.service';
 
 @Module({
   imports: [LibModule, DbModule, HttpModule],
@@ -16,8 +19,14 @@ import { SocialLoginService } from './social-login.service';
     GoogleLoginController,
     KakaoLoginController,
     NaverLoginController,
+    LoginFirebaseController,
   ],
-  providers: [LoginService, SocialLoginService],
+  providers: [
+    LoginService,
+    SocialLoginService,
+    FirebaseAccountService,
+    FirebaeLoginService,
+  ],
   exports: [LoginService],
 })
 export class LoginModule {}
