@@ -5,16 +5,6 @@ import { KakaoToken, KakaoUser } from './dto/kakao.dto';
 import { NaverToken } from './dto/naver.dto';
 import { GoogleUser } from './dto/google.dto';
 
-export interface SocialLoginData {
-  mbId: string;
-  provider: string;
-  identifier: string;
-  mbName?: string;
-  mbNick?: string;
-  mbEmail?: string;
-  mbHp?: string;
-}
-
 @Injectable()
 export class SocialLoginService {
   private readonly socialApiList = {

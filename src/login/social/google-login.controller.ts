@@ -10,7 +10,9 @@ import { SocialLoginService } from '../social-login.service';
 @ApiTags('google-login')
 @Controller('google-login')
 export class GoogleLoginController {
-  private readonly google = JSON.parse(this.configService.get('GOOGLE'));
+  private readonly google = JSON.parse(
+    this.configService.get('GOOGLE') || '{}',
+  );
 
   constructor(
     private readonly httpService: HttpService,
@@ -24,8 +26,8 @@ export class GoogleLoginController {
   @Get('authorize')
   authorize(@Res() res: Response) {
     const query = new URLSearchParams({
-      client_id: this.google.clientId,
-      redirect_uri: this.google.redirectUri,
+      client_id: this.google?.clientId,
+      redirect_uri: this.google?.redirectUri,
       response_type: 'code',
       scope: 'email profile',
     });
@@ -46,10 +48,10 @@ export class GoogleLoginController {
         `https://oauth2.googleapis.com/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
-          client_id: this.google.clientId,
-          client_secret: this.google.secretKey,
+          client_id: this.google?.clientId,
+          client_secret: this.google?.secretKey,
           code,
-          redirect_uri: this.google.redirectUri,
+          redirect_uri: this.google?.redirectUri,
         }),
       ),
     );

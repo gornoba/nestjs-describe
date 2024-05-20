@@ -1,6 +1,3 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { G5MemberSocialProfilesEntity } from 'src/db/entities/member/g5-member-social-profiles.entity';
-
 export class KakaoAccount {
   profile_needs_agreement?: boolean; //	사용자 동의 시 프로필 정보(닉네임/프로필 사진) 제공 가능
   profile_nickname_needs_agreement?: boolean; //	사용자 동의 시 닉네임 제공 가능
@@ -72,43 +69,4 @@ export class KakaoToken {
   expires_in: number;
   app_id: number;
   appId: number;
-}
-
-export class KakaoTokenVerify extends PickType(G5MemberSocialProfilesEntity, [
-  'mbId',
-  'provider',
-  'identifier',
-] as const) {}
-
-export class KakaoIdNotExists {
-  @ApiProperty({
-    example: false,
-    description: '아이디 존재 여부',
-    type: Boolean,
-  })
-  exists: false;
-
-  @ApiProperty({
-    type: KakaoTokenVerify,
-  })
-  tokenInfo: KakaoTokenVerify;
-}
-
-export class KakaoIdExists {
-  @ApiProperty({
-    example: true,
-    description: '아이디 존재 여부',
-    type: Boolean,
-  })
-  exists: true;
-
-  idInfo: {
-    mpNo: number;
-    branchName: string;
-  }[];
-
-  @ApiProperty({
-    type: KakaoTokenVerify,
-  })
-  tokenInfo: KakaoTokenVerify;
 }

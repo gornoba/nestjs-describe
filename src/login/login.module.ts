@@ -7,6 +7,7 @@ import { HttpModule } from '@nestjs/axios';
 import { GoogleLoginController } from './social/google-login.controller';
 import { KakaoLoginController } from './social/kakao-login.controller';
 import { NaverLoginController } from './social/naver-login.controller';
+import { SocialLoginService } from './social-login.service';
 
 @Module({
   imports: [LibModule, DbModule, HttpModule],
@@ -16,7 +17,7 @@ import { NaverLoginController } from './social/naver-login.controller';
     KakaoLoginController,
     NaverLoginController,
   ],
-  providers: [LoginService],
+  providers: [LoginService, SocialLoginService],
   exports: [LoginService],
 })
 export class LoginModule {}
